@@ -4,9 +4,13 @@ import { hash } from '../../Auth/Services/encryptionService.js';
 
 export const createUserController = async (request, response) => {
 
-    const { name, name_hash, password, rol, estado, ultima_conexion } = request.body;
-
-    const name_hashed = hash(name_hash);
+    const { name, password, rol } = request.body;
+    if (!name || !password || !rol) {
+        return response.status(400).json({
+            message: 'Todos los campos son requeridos',
+        });
+    }
+    const name_hashed = hash(name);
     const existente = await User.findOne({
         where: { name_hash: name_hashed }
     });
@@ -19,16 +23,15 @@ export const createUserController = async (request, response) => {
 
     const user = await User.create({
         name: name,
+        name_hash: name_hashed,
         password: await PasswordService.encrypt(password),
         rol: rol,
-        estado: estado,
-        ultima_conexion: ultima_conexion
+        estado: true,
+        ultima_conexion: new Date(),
     });
 
-    const resultado = user.toJSON();
-    delete resultado.name_hash;
+    return response.status(201).json({
+    });
 
-
-    console.log(user);
 
 }

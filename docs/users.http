@@ -23,3 +23,7 @@ Content-Type: application/json
     "name": "Erick1",
     "password": "123456789"
 }
+###
+DELETE  http://localhost:3000/api/v1/usuarios HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkMTc3Yjk2ZC0wOTFhLTRmYzctOGM2MS00N2RmYjQ1NzE3YWEiLCJpYXQiOjE3NjM0MjExMDksImV4cCI6MTc2MzQyNDcwOX0.tdmxTKjDhUwUhXMKqp23Z8c1K6FbTxbdLqqxoiSLTIw
