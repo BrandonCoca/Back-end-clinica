@@ -7,7 +7,7 @@ export const updateController = async (request, response) => {
 
     user.name = name;
     user.rol = rol;
-    user.save();
+    await user.save();
 
     return response.status(200).json({});
 };         
