@@ -11,6 +11,7 @@ import { Test } from './Models/Test.js';
 import { Trazabilitie } from './Models/Trazabilitie.js';
 import { loginController } from './Auth/Controllers/loginController.js';
 import { verifyTokenController } from './Auth/Controllers/verifyTokenController.js';
+import { showProfileController } from './Controllers/General/showProfileController.js';
 import { indexUserController } from './Controllers/User/indexUserController.js';
 import { createUserController } from './Controllers/User/createUserController.js';
 import { showController } from './Controllers/User/showController.js';
@@ -21,10 +22,12 @@ const router = express.Router();
 
 router.post('/api/v1/login', loginController);
 router.get('/api/v1/token/verify', verifyTokenController);
+router.get('/api/v1/perfil', tokenMiddleware, showProfileController);
 router.get('/api/v1/usuarios', tokenMiddleware, indexUserController);
 router.post('/api/v1/usuarios', tokenMiddleware, createUserController);
 router.get('/api/v1/usuarios/:id', tokenMiddleware, showController);
 router.patch('/api/v1/usuarios/:id', tokenMiddleware, updateController);
+
 //router.delete('/api/v1/usuarios/:id', tokenMiddleware, deleteUserController);
 
 export { router }; 

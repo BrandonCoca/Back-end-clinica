@@ -15,6 +15,7 @@ export const loginController = async (request, response) => {
     if (!userExist) {
         return response.status(401).json({ message: "Credenciales incorrectas" });
     }
+    await user.update({ ultima_conexion: new Date() });
     const token = jwt.sign({ userId: user.id }, env('JWT_SECRET_KEY'), { expiresIn: '1h' });
     const jsonResponse = { message: 'Usuario logeado exitosamente', data: { token } }
     return response.json(jsonResponse);

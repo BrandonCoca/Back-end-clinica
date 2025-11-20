@@ -1,13 +1,13 @@
 import cors from 'cors';
 import { env } from './Shared/env.js';
 
-const allowedOrigins = [
-    'http://127.0.0.1:8080',
-    'http://localhost:8080',
-];
+const allowedOrigins = env('ALLOWED_ORIGINS')
+    .split(',')
+    .map(origin => origin.trim());
 
 const corsOptions = {
     origin: (origin, callback) => {
+
         if (!origin) {
             return callback(null, true);
         }
