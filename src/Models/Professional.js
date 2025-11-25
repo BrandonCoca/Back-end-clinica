@@ -25,5 +25,21 @@ const Professional = sequealize.define('professionals', {
         allowNull: false
     }
 }, { timestamps: false });
-
+Professional.paginate = async (records, page) => {
+    const profesionals = await Professional.findAll({
+        offset: (page - 1) * records,
+        limit: records,
+        order: [['nombre', 'ASC']],
+    });
+    const lastPage = Math.ceil((await Professional.count()) / records);
+    return {
+        data: profesionals,
+        meta: {
+            current: page,
+            records: records,
+            next: (lastPage >= page + 1) ? page + 1 : null,
+            last: lastPage
+        }
+    }
+}
 export { Professional };

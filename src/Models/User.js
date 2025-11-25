@@ -47,5 +47,21 @@ const User = sequealize.define('users', {
         defaultValue: DataTypes.NOW
     }
 }, { timestamps: false });
-
+User.paginate = async (records, page) => {
+    const users = await User.findAll({
+        limit: records,
+        offset: records * (page - 1),
+        order: [['estado', 'DESC']],
+    });
+    const lastPage = Math.ceil((await User.count()) / records);
+    return {
+        data: users,
+        meta: {
+            current: page,
+            records: records,
+            next: (lastPage >= page + 1) ? page + 1 : null,
+            last: lastPage
+        }
+    }
+}
 export { User };

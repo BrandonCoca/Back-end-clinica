@@ -11,6 +11,9 @@ export const loginController = async (request, response) => {
     if (!user) {
         return response.status(401).json({ message: "Credenciales incorrectas" });
     }
+    if (!user.estado) {
+        return response.status(401).json({ message: "Usuario inactivo. Contacte al administrador." });
+    }
     const userExist = await PasswordService.check(password, user.password);
     if (!userExist) {
         return response.status(401).json({ message: "Credenciales incorrectas" });

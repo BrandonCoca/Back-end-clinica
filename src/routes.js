@@ -16,18 +16,37 @@ import { indexUserController } from './Controllers/User/indexUserController.js';
 import { createUserController } from './Controllers/User/createUserController.js';
 import { showController } from './Controllers/User/showController.js';
 import { updateController } from './Controllers/User/updateController.js';
-//import { deleteUserController } from './Controllers/User/deleteUserController.js';
-
+import { deleteUserController } from './Controllers/User/deleteUserController.js';
+import { indexPatientController } from './Controllers/Patient/indexPatientController.js';
+import { createPatientController } from './Controllers/Patient/createPatientController.js';
+import { showPatientController } from './Controllers/Patient/showPatientController.js';
+import { updatePatientController } from './Controllers/Patient/updatePatientController.js';
+import { indexProfessionalController } from './Controllers/Professional/indexProfessionalController.js';
+import { createProfessionalController } from './Controllers/Professional/createProfessionalController.js';
+import { showProfessionalController } from './Controllers/Professional/showProfessionalController.js';
+import { updateProfessionalController } from './Controllers/Professional/updateProfessionalController.js';
+// import { deleteProfessionalController } from './Controllers/Professional/deleteProfessionalController.js';
 const router = express.Router();
 
 router.post('/api/v1/login', loginController);
 router.get('/api/v1/token/verify', verifyTokenController);
 router.get('/api/v1/perfil', tokenMiddleware, showProfileController);
+//usuarios
 router.get('/api/v1/usuarios', tokenMiddleware, indexUserController);
 router.post('/api/v1/usuarios', tokenMiddleware, createUserController);
 router.get('/api/v1/usuarios/:id', tokenMiddleware, showController);
 router.patch('/api/v1/usuarios/:id', tokenMiddleware, updateController);
-
-//router.delete('/api/v1/usuarios/:id', tokenMiddleware, deleteUserController);
+router.delete('/api/v1/usuarios/:id', tokenMiddleware, deleteUserController);
+//pacientes
+router.get('/api/v1/pacientes', tokenMiddleware, indexPatientController);
+router.post('/api/v1/pacientes', tokenMiddleware, createPatientController);
+router.get('/api/v1/pacientes/:id', tokenMiddleware, showPatientController);
+router.patch('/api/v1/pacientes/:id', tokenMiddleware, updatePatientController);
+//Profesionales
+router.get('/api/v1/profesionales', tokenMiddleware, indexProfessionalController);
+router.post('/api/v1/profesionales', tokenMiddleware, createProfessionalController);
+router.get('/api/v1/profesionales/:id', tokenMiddleware, showProfessionalController);
+router.patch('/api/v1/profesionales/:id', tokenMiddleware, updateProfessionalController);
+// router.delete('/api/v1/profesionales/:id', tokenMiddleware, deleteProfessionalController);
 
 export { router }; 

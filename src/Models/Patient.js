@@ -60,5 +60,20 @@ const Patient = sequealize.define('patients', {
         allowNull: false,
     }
 }, { timestamps: false });
-
+Patient.paginate = async (records, page) => {
+    const patients = await Patient.findAll({
+        limit: records,
+        offset: records * (page - 1),
+    });
+    const lastPage = Math.ceil((await Patient.count()) / records);
+    return {
+        data: patients,
+        meta: {
+            current: page,
+            records: records,
+            next: (lastPage >= page + 1) ? page + 1 : null,
+            last: lastPage
+        }
+    }
+}
 export { Patient };

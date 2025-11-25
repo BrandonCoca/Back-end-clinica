@@ -17,5 +17,4 @@ const corsOptions = {
         return callback(null, true);
     }
 }
-
 export default cors(corsOptions);
