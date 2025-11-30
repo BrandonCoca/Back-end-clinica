@@ -5,7 +5,7 @@ export const createPatientController = async (request, response) => {
 
     const { nombre, ci, fecha_nac, genero, cel } = request.body;
 
-    if (!nombre || !ci || !fecha_nac || !genero || !cel) {
+    if (!nombre || !ci || !fecha_nac || genero === null || genero === undefined || !cel) {
         return response.status(401).json({ message: 'Todos los campos son requeridos' });
     }
     const nombreRegex = /^[A-ZÑÁÉÍÓÚÜ][a-zñáéíóúü]+(?:\s[A-ZÑÁÉÍÓÚÜ][a-zñáéíóúü]+)+$/;

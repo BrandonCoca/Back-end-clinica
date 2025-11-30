@@ -38,7 +38,7 @@ const Consultation = sequealize.define('consultations', {
     },
     quote_id: {
         type: DataTypes.UUID,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: 'quotes',
             key: 'id'

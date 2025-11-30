@@ -25,7 +25,8 @@ import { indexProfessionalController } from './Controllers/Professional/indexPro
 import { createProfessionalController } from './Controllers/Professional/createProfessionalController.js';
 import { showProfessionalController } from './Controllers/Professional/showProfessionalController.js';
 import { updateProfessionalController } from './Controllers/Professional/updateProfessionalController.js';
-// import { deleteProfessionalController } from './Controllers/Professional/deleteProfessionalController.js';
+import { createRecetController } from './Controllers/Recet/createRecetController.js';
+import { createConsultationController } from './Controllers/Consultation/createConsultationController.js';
 const router = express.Router();
 
 router.post('/api/v1/login', loginController);
@@ -47,6 +48,9 @@ router.get('/api/v1/profesionales', tokenMiddleware, indexProfessionalController
 router.post('/api/v1/profesionales', tokenMiddleware, createProfessionalController);
 router.get('/api/v1/profesionales/:id', tokenMiddleware, showProfessionalController);
 router.patch('/api/v1/profesionales/:id', tokenMiddleware, updateProfessionalController);
-// router.delete('/api/v1/profesionales/:id', tokenMiddleware, deleteProfessionalController);
+//Consultas
+router.post('/api/v1/consultas', tokenMiddleware, createConsultationController);
+//Recetas
+router.post('/api/v1/recetas', tokenMiddleware, createRecetController);
 
 export { router }; 
