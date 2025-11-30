@@ -10,7 +10,7 @@ const Consultation = sequealize.define('consultations', {
     fecha: {
         type: DataTypes.DATE,
         allowNull: false,
-        defaultValue: DataTypes.NOW,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
     },
     motivo: {
         type: DataTypes.STRING,
@@ -44,6 +44,9 @@ const Consultation = sequealize.define('consultations', {
             key: 'id'
         }
     }
-}, { timestamps: false });
+}, {
+    timestamps: false,
+    freezeTableName: true
+});
 
 export { Consultation };

@@ -1,11 +1,9 @@
 import { Consultation } from "../../Models/Consultation.js";
-import { Patient } from "../../Models/Patient.js";
-import { Professional } from "../../Models/Professional.js";
-import { Quote } from "../../Models/Quote.js";
 
 export const createConsultationController = async (request, response) => {
-    const { fecha, motivo, descripcion, professional_id, patient_id, quote_id } = request.body;
-    if (!motivo || !descripcion || !professional_id || !patient_id) {
+    const patient_Id = request.params.patientId;
+    const { motivo, descripcion, professional_id, quote_id } = request.body;
+    if (!motivo || !descripcion || !professional_id) {
         return response.status(401).json({ message: 'Todos los campos son requeridos' });
     }
     const motivoRegex = /^[a-zA-Z0-9\s/+-ñÑáéíóúÁÉÍÓÚüÜ]{1,}$/;
@@ -21,8 +19,8 @@ export const createConsultationController = async (request, response) => {
         motivo: motivo,
         descripcion: descripcion,
         professional_id: professional_id,
-        patient_id: patient_id,
-        quote_id: quote_id
+        patient_id: patient_Id,
+        quote_id: null
     });
     return response.status(201).json({});
 }

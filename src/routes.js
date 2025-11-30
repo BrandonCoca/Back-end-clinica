@@ -27,6 +27,7 @@ import { showProfessionalController } from './Controllers/Professional/showProfe
 import { updateProfessionalController } from './Controllers/Professional/updateProfessionalController.js';
 import { createRecetController } from './Controllers/Recet/createRecetController.js';
 import { createConsultationController } from './Controllers/Consultation/createConsultationController.js';
+import { showConsultationController } from './Controllers/Consultation/showConsultationController.js';
 const router = express.Router();
 
 router.post('/api/v1/login', loginController);
@@ -49,8 +50,9 @@ router.post('/api/v1/profesionales', tokenMiddleware, createProfessionalControll
 router.get('/api/v1/profesionales/:id', tokenMiddleware, showProfessionalController);
 router.patch('/api/v1/profesionales/:id', tokenMiddleware, updateProfessionalController);
 //Consultas
-router.post('/api/v1/consultas', tokenMiddleware, createConsultationController);
+router.post('/api/v1/pacientes/:patientId/consultas', tokenMiddleware, createConsultationController);
+router.get('/api/v1/pacientes/:patientId/consultas', tokenMiddleware, showConsultationController);
 //Recetas
-router.post('/api/v1/recetas', tokenMiddleware, createRecetController);
+router.post('/api/v1/consultas/:consultationId/recetas', tokenMiddleware, createRecetController);
 
 export { router }; 
