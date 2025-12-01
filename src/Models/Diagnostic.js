@@ -8,13 +8,12 @@ const Diagnostic = sequealize.define('diagnostics', {
         primaryKey: true
     },
     codigo: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(10),
         allowNull: false
     },
     descripcion: {
         type: DataTypes.TEXT,
-        allowNull: true,
-        comment: 'Descripción del código CIE-10'
+        allowNull: false
     },
     consultation_id: {
         type: DataTypes.UUID,
@@ -24,6 +23,6 @@ const Diagnostic = sequealize.define('diagnostics', {
             key: 'id'
         }
     }
-}, { timestamps: false });
+}, { timestamps: false, freezeTableName: true });
 
 export { Diagnostic };

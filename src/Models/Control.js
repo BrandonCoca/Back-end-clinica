@@ -1,7 +1,7 @@
 import { Sequelize, DataTypes } from "sequelize";
 import { sequealize } from "../database.js";
 
-const Observation = sequealize.define('observations', {
+const Control = sequealize.define('controls', {
     id: {
         type: DataTypes.UUID,
         defaultValue: Sequelize.UUIDV4,
@@ -21,4 +21,4 @@ const Observation = sequealize.define('observations', {
     }
 }, { timestamps: false });
 
-export { Observation };
+export { Control };

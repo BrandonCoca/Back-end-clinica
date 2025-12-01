@@ -68,23 +68,20 @@ class CIE10Service {
     }
 
     /**
-     * Busca códigos CIE-10 por término de búsqueda
+     * Busca códigos CIE-10 por término de búsqueda (solo en español)
      * @param {string} searchTerm - Término de búsqueda
      * @param {number} maxResults - Máximo de resultados a retornar
-     * @param {string} lang - Idioma ('es' para español, 'en' para inglés)
-     * @returns {Promise<Array>} - Lista de códigos CIE-10 que coinciden
+     * @returns {Promise<Object>} - Lista de códigos CIE-10 que coinciden
      */
-    async searchByTerm(searchTerm, maxResults = 10, lang = 'es') {
+    async searchByTerm(searchTerm, maxResults = 10) {
         try {
             // Intenta primero con la API de la OMS (soporta español)
-            if (lang === 'es') {
-                const whoResults = await this.searchByTermWHO(searchTerm, maxResults);
-                if (whoResults.success && whoResults.results.length > 0) {
-                    return whoResults;
-                }
+            const whoResults = await this.searchByTermWHO(searchTerm, maxResults);
+            if (whoResults.success && whoResults.results.length > 0) {
+                return whoResults;
             }
 
-            // Si falla o es inglés, usar ClinicalTables (solo inglés)
+            // Si la API de la OMS falla, usar ClinicalTables y traducir
             const response = await axios.get('https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search', {
                 params: {
                     sf: 'code,name',  // Campos a buscar (code y name)
@@ -104,17 +101,10 @@ class CIE10Service {
                     language: 'en'
                 }));
 
-                // Si pidieron español pero obtuvimos inglés, intentar traducir con base local
-                if (lang === 'es' && results.length > 0) {
-                    return {
-                        success: true,
-                        results: await this.enrichWithSpanish(results)
-                    };
-                }
-
+                // Enriquecer con traducciones al español desde base local
                 return {
                     success: true,
-                    results
+                    results: await this.enrichWithSpanish(results)
                 };
             }
 
@@ -188,6 +178,7 @@ class CIE10Service {
 
     /**
      * Enriquece los resultados en inglés con descripciones en español desde base local
+     * Retorna todos los resultados: en español si hay traducción, en inglés si no
      */
     async enrichWithSpanish(results) {
         // Base de datos local de códigos comunes en español
@@ -196,17 +187,18 @@ class CIE10Service {
         return results.map(result => {
             const spanishEntry = spanishDB[result.code];
             if (spanishEntry) {
+                // Hay traducción al español
                 return {
-                    ...result,
+                    code: result.code,
                     description: spanishEntry,
-                    descriptionEn: result.description,
                     language: 'es'
                 };
             }
+            // No hay traducción, mantener en inglés
             return {
-                ...result,
-                descriptionEn: result.description,
-                language: 'en' // Mantener en inglés si no hay traducción
+                code: result.code,
+                description: result.description,
+                language: 'en'
             };
         });
     }
@@ -217,18 +209,48 @@ class CIE10Service {
     getSpanishDatabase() {
         return {
             // Enfermedades endocrinas y metabólicas (E00-E90)
+            'E10.9': 'Diabetes mellitus tipo 1 sin complicaciones',
+            'E10.65': 'Diabetes mellitus tipo 1 con hiperglucemia',
+            'E10.A0': 'Diabetes mellitus tipo 1 presintomática no especificada',
+            'E10.10': 'Diabetes mellitus tipo 1 con cetoacidosis sin coma',
+            'E10.21': 'Diabetes mellitus tipo 1 con nefropatía',
+            'E10.22': 'Diabetes mellitus tipo 1 con enfermedad renal crónica',
+            'E10.29': 'Diabetes mellitus tipo 1 con otra complicación renal',
+            'E10.36': 'Diabetes mellitus tipo 1 con neuropatía periférica',
+            'E10.40': 'Diabetes mellitus tipo 1 con neuropatía diabética no especificada',
+            'E10.51': 'Diabetes mellitus tipo 1 con complicación circulatoria periférica',
+
             'E11.9': 'Diabetes mellitus tipo 2 sin complicaciones',
             'E11.65': 'Diabetes mellitus tipo 2 con hiperglucemia',
             'E11.22': 'Diabetes mellitus tipo 2 con enfermedad renal crónica',
             'E11.69': 'Diabetes mellitus tipo 2 con otra complicación especificada',
-            'E10.9': 'Diabetes mellitus tipo 1 sin complicaciones',
-            'E10.65': 'Diabetes mellitus tipo 1 con hiperglucemia',
+            'E11.00': 'Diabetes mellitus tipo 2 con hiperosmolaridad sin coma',
+            'E11.21': 'Diabetes mellitus tipo 2 con nefropatía',
+            'E11.29': 'Diabetes mellitus tipo 2 con otra complicación renal',
+            'E11.36': 'Diabetes mellitus tipo 2 con neuropatía periférica',
+            'E11.40': 'Diabetes mellitus tipo 2 con neuropatía diabética no especificada',
+            'E11.51': 'Diabetes mellitus tipo 2 con complicación circulatoria periférica',
+            'E11.59': 'Diabetes mellitus tipo 2 con otra complicación circulatoria',
+
+            'E13.9': 'Otros tipos especificados de diabetes mellitus sin complicaciones',
+            'E13.65': 'Otros tipos especificados de diabetes mellitus con hiperglucemia',
+
+            'E23.2': 'Diabetes insípida',
+            'P70.2': 'Diabetes mellitus neonatal',
+
             'E78.5': 'Hiperlipidemia no especificada',
             'E78.0': 'Hipercolesterolemia pura',
+            'E78.1': 'Hipergliceridemia pura',
+            'E78.2': 'Hiperlipidemia mixta',
+
             'E66.9': 'Obesidad no especificada',
             'E66.01': 'Obesidad mórbida debida a calorías excesivas',
+            'E66.8': 'Otra obesidad',
+
             'E03.9': 'Hipotiroidismo no especificado',
             'E05.90': 'Tirotoxicosis no especificada sin crisis tirotóxica',
+            'E04.9': 'Bocio no tóxico no especificado',
+            'E06.3': 'Tiroiditis autoinmune',
 
             // Enfermedades del sistema circulatorio (I00-I99)
             'I10': 'Hipertensión esencial (primaria)',
@@ -236,6 +258,8 @@ class CIE10Service {
             'I25.10': 'Enfermedad aterosclerótica del corazón sin angina de pecho',
             'I48.91': 'Fibrilación auricular no especificada',
             'I50.9': 'Insuficiencia cardíaca no especificada',
+            'I21.9': 'Infarto agudo de miocardio no especificado',
+            'I63.9': 'Infarto cerebral no especificado',
 
             // Enfermedades del sistema respiratorio (J00-J99)
             'J45.9': 'Asma no especificado',
@@ -274,6 +298,9 @@ class CIE10Service {
             // Embarazo, parto y puerperio (O00-O99)
             'O24.92': 'Diabetes mellitus no especificada en el parto',
             'O24.91': 'Diabetes mellitus no especificada en el embarazo',
+            'O24.019': 'Diabetes mellitus preexistente tipo 1 en el embarazo',
+            'O24.119': 'Diabetes mellitus preexistente tipo 2 en el embarazo',
+            'O24.419': 'Diabetes mellitus gestacional en el embarazo',
 
             // Enfermedades del sistema musculoesquelético (M00-M99)
             'M79.3': 'Paniculitis no especificada',
@@ -282,7 +309,12 @@ class CIE10Service {
 
             // Factores que influyen en el estado de salud (Z00-Z99)
             'Z83.3': 'Antecedentes familiares de diabetes mellitus',
-            'Z00.00': 'Examen médico general sin quejas, diagnóstico reportado'
+            'Z86.32': 'Antecedentes personales de diabetes mellitus gestacional',
+            'Z00.00': 'Examen médico general sin quejas',
+            'Z01.00': 'Examen de ojos y visión sin hallazgos anormales',
+            'Z13.1': 'Examen de detección especial para diabetes mellitus',
+            'Z79.4': 'Uso a largo plazo (actual) de insulina',
+            'Z79.84': 'Uso a largo plazo (actual) de hipoglucemiantes orales'
         };
     }
 

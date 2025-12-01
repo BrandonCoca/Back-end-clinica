@@ -4,30 +4,44 @@ import { Diagnostic } from '../../Models/Diagnostic.js';
  * Controlador para crear un nuevo diagnóstico
  * POST /api/v1/consultas/:consultationId/diagnosticos
  * 
- * El código CIE-10 debe ser validado previamente usando el middleware validateCIE10Middleware
+ * Guarda el código CIE-10 y su descripción directamente en la tabla diagnostics
+ * No requiere que el código exista previamente en una tabla cie10
  */
 export const createDiagnosticController = async (request, response) => {
     try {
         const { consultationId } = request.params;
-        const { codigo } = request.body;
+        const { codigo, descripcion } = request.body;
 
-        // El middleware validateCIE10Middleware ya validó el código y guardó la info
-        const cie10Info = request.cie10Info;
+        // Validar que se proporcionen los datos requeridos
+        if (!codigo || !descripcion) {
+            return response.status(400).json({
+                success: false,
+                message: 'El código y la descripción del CIE-10 son requeridos'
+            });
+        }
 
-        // Crear el diagnóstico con el código validado
+        // Limpiar y normalizar el código
+        const cleanCode = codigo.trim().toUpperCase();
+
+        // Validar formato básico del código CIE-10
+        if (!/^[A-Z]\d{2}(\.\d{1,2})?$/.test(cleanCode)) {
+            return response.status(400).json({
+                success: false,
+                message: 'Formato de código CIE-10 inválido. Debe ser como: A00, A00.1, E11.9'
+            });
+        }
+
+        // Crear el diagnóstico con el código y descripción proporcionados
         const diagnostic = await Diagnostic.create({
-            codigo: codigo.trim().toUpperCase(),
-            descripcion: cie10Info?.description || null, // Guardar la descripción si existe
+            codigo: cleanCode,
+            descripcion: descripcion.trim(),
             consultation_id: consultationId
         });
 
         return response.status(201).json({
             success: true,
             message: 'Diagnóstico creado exitosamente',
-            data: {
-                diagnostic,
-                cie10_info: cie10Info // Información adicional del CIE-10
-            }
+            data: diagnostic
         });
 
     } catch (error) {
@@ -51,7 +65,8 @@ export const listDiagnosticsController = async (request, response) => {
         const diagnostics = await Diagnostic.findAll({
             where: {
                 consultation_id: consultationId
-            }
+            },
+            order: [['id', 'ASC']]
         });
 
         return response.status(200).json({
