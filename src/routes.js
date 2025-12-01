@@ -1,14 +1,5 @@
 import express from 'express';
 import { tokenMiddleware } from './Auth/Middlewares/tokenMiddleware.js';
-import { Consultation } from './Models/Consultation.js';
-import { Diagnostic } from './Models/Diagnostic.js';
-import { Observation } from './Models/Control.js';
-import { Patient } from './Models/Patient.js';
-import { Professional } from './Models/Professional.js';
-import { Quote } from './Models/Quote.js';
-import { Recet } from './Models/Recet.js';
-import { Test } from './Models/Test.js';
-import { Trazabilitie } from './Models/Trazabilitie.js';
 import { loginController } from './Auth/Controllers/loginController.js';
 import { verifyTokenController } from './Auth/Controllers/verifyTokenController.js';
 import { showProfileController } from './Controllers/General/showProfileController.js';
@@ -28,6 +19,10 @@ import { updateProfessionalController } from './Controllers/Professional/updateP
 import { createRecetController } from './Controllers/Recet/createRecetController.js';
 import { createConsultationController } from './Controllers/Consultation/createConsultationController.js';
 import { showConsultationController } from './Controllers/Consultation/showConsultationController.js';
+import { showRecetController } from './Controllers/Recet/showRecetController.js';
+import { searchCIE10ByTerm } from './Controllers/Diagnostic/searchCIE10Controller.js';
+import { createDiagnosticController, listDiagnosticsController } from './Controllers/Diagnostic/diagnosticController.js';
+import { validateCIE10Middleware } from './Shared/validateCIE10Middleware.js';
 const router = express.Router();
 
 router.post('/api/v1/login', loginController);
@@ -54,5 +49,11 @@ router.post('/api/v1/pacientes/:patientId/consultas', tokenMiddleware, createCon
 router.get('/api/v1/pacientes/:patientId/consultas', tokenMiddleware, showConsultationController);
 //Recetas
 router.post('/api/v1/consultas/:consultationId/recetas', tokenMiddleware, createRecetController);
+router.get('/api/v1/consultas/:consultationId/recetas', tokenMiddleware, showRecetController);
+//Diagnósticos (solo crear y listar)
+router.post('/api/v1/consultas/:consultationId/diagnosticos', tokenMiddleware, validateCIE10Middleware, createDiagnosticController);
+router.get('/api/v1/consultas/:consultationId/diagnosticos', tokenMiddleware, listDiagnosticsController);
+//CIE-10 (solo búsqueda por descripción/nombre)
+router.get('/api/v1/cie10/search', tokenMiddleware, searchCIE10ByTerm);
 
 export { router }; 

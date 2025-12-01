@@ -11,6 +11,11 @@ const Diagnostic = sequealize.define('diagnostics', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    descripcion: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        comment: 'Descripción del código CIE-10'
+    },
     consultation_id: {
         type: DataTypes.UUID,
         allowNull: false,
